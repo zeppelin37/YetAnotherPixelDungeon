@@ -86,8 +86,9 @@ public class StartScene extends PixelScene {
 	
 	private float buttonX;
 	private float buttonY;
-	
+
 	private GameButton btnLoad;
+	private GameButton btnLoadCheckpoint;
 	private GameButton btnNewGame;
 
     private boolean brigandUnlocked;
@@ -135,7 +136,7 @@ public class StartScene extends PixelScene {
 		add( title );
 		
 		buttonX = left;
-		buttonY = bottom - BUTTON_HEIGHT;
+		buttonY = bottom - BUTTON_HEIGHT * 2 - GAP;
 		
 		btnNewGame = new GameButton( TXT_NEW ) {
 			@Override
@@ -165,7 +166,16 @@ public class StartScene extends PixelScene {
 			}
 		};
 		add( btnLoad );	
-		
+		btnLoadCheckpoint = new GameButton( "Load Last Checkpoint"){
+			@Override
+			protected void onClick() {
+				InterlevelScene.mode = InterlevelScene.Mode.LOADCHECKPOINT;
+				Game.switchScene( InterlevelScene.class );
+			}
+		};
+		add( btnLoadCheckpoint );
+		btnLoadCheckpoint.visible = true;
+
 		float centralHeight = buttonY - title.y - title.height();
 		
 		HeroClass[] classes = {
@@ -372,7 +382,7 @@ public class StartScene extends PixelScene {
 				btnNewGame.secondary( null, false );
 				btnNewGame.setRect( buttonX, buttonY, Camera.main.width - buttonX * 2, BUTTON_HEIGHT );
 			}
-			
+			btnLoadCheckpoint.setRect( buttonX, buttonY + GAP + BUTTON_HEIGHT, Camera.main.width - buttonX * 2, BUTTON_HEIGHT);
 //		}
 	}
 

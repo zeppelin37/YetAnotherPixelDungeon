@@ -281,6 +281,7 @@ public class GameScene extends PixelScene {
             Sample.INSTANCE.play( Assets.SND_TELEPORT );
 			break;
 		case RETURN:
+		    case LOADCHECKPOINT:
             ScrollOfPhaseWarp.appear( Dungeon.hero, Dungeon.hero.pos );
 			break;
 		case FALL:

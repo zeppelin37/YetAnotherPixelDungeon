@@ -22,7 +22,6 @@ package com.consideredhamster.yetanotherpixeldungeon.scenes;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import com.watabou.input.Touchscreen;
 import com.watabou.noosa.BitmapText;
@@ -60,7 +59,7 @@ public class InterlevelScene extends PixelScene {
 	private static final String ERR_GENERIC			= "Something went wrong..."	;	
 	
 	public static enum Mode {
-		DESCEND, ASCEND, CONTINUE, RESURRECT, RETURN, FALL
+		DESCEND, ASCEND, CONTINUE, RESURRECT, LOADCHECKPOINT, RETURN, FALL
 	};
 	public static Mode mode;
 	
@@ -345,6 +344,7 @@ public class InterlevelScene extends PixelScene {
 //                depth = depth > 0 ? depth : 0 ;
 
                 break;
+			case LOADCHECKPOINT:
             case RESURRECT:
                 text = TXT_RESURRECTING;
                 break;
@@ -390,7 +390,7 @@ public class InterlevelScene extends PixelScene {
 			public void run() {
 				
 				try {
-					
+
 					Generator.reset();
 					
 					switch (mode) {
@@ -403,6 +403,9 @@ public class InterlevelScene extends PixelScene {
 					case CONTINUE:
 						restore();
 						break;
+					case LOADCHECKPOINT:
+                        restoreCheckpoint();
+                        break;
 //					case RESURRECT:
 //                        resurrect();
 //                        break;
@@ -418,7 +421,7 @@ public class InterlevelScene extends PixelScene {
 						Sample.INSTANCE.load( Assets.SND_BOSS );
 					}
 
-                    if( mode != Mode.CONTINUE ) {
+                    if( mode != Mode.CONTINUE && mode != Mode.LOADCHECKPOINT) {
                         Dungeon.saveAll();
                         Badges.saveGlobal();
                     }
@@ -527,7 +530,7 @@ public class InterlevelScene extends PixelScene {
 	private void descend() throws Exception {
 		
 		Actor.fixTime();
-
+		boolean newLevel = false;
 		if (Dungeon.hero == null) {
 			Dungeon.init();
 			if (noStory) {
@@ -541,11 +544,16 @@ public class InterlevelScene extends PixelScene {
 		Level level;
 		if (Dungeon.depth >= Statistics.deepestFloor) {
 			level = Dungeon.newLevel();
+			newLevel = true;
 		} else {
 			Dungeon.depth++;
 			level = Dungeon.loadLevel( Dungeon.hero.heroClass );
 		}
 		Dungeon.switchLevel( level, level.entrance );
+
+		if(newLevel) Dungeon.saveCheckpoint();
+
+
 	}
 	
 	private void fall() throws Exception {
@@ -583,7 +591,19 @@ public class InterlevelScene extends PixelScene {
 		Level level = Dungeon.loadLevel( Dungeon.hero.heroClass );
 		Dungeon.switchLevel(level, Level.resizingNeeded ? level.adjustPos(returnPos) : returnPos);
 	}
-	
+	private void restoreCheckpoint() throws Exception {
+
+		Actor.fixTime();
+
+		Dungeon.loadCheckpoint(StartScene.curClass);
+		if (Dungeon.depth == -1) {
+			Dungeon.depth = Statistics.deepestFloor;
+			Dungeon.switchLevel( Dungeon.loadLevel( StartScene.curClass ), -1 );
+		} else {
+			Level level = Dungeon.loadLevel( StartScene.curClass );
+			Dungeon.switchLevel( level, Level.resizingNeeded ? level.adjustPos( Dungeon.hero.pos ) : Dungeon.hero.pos );
+		}
+	}
 	private void restore() throws Exception {
 		
 		Actor.fixTime();
