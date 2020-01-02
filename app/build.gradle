@@ -10,6 +10,7 @@ android {
         versionCode 325
         versionName '0.3.2a'
         archivesBaseName = "yapd-zeppelin37-$versionName"
+        signingConfig signingConfigs.debug
     }
 
     buildTypes {

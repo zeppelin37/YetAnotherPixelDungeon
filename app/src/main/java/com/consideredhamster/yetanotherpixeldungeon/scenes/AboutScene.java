@@ -44,7 +44,7 @@ public class AboutScene extends PixelScene {
 
     private static final String TXT_PART1 =
             "Mod author:\n" +
-            "\u007F ConsideredHamster\n" +
+            "\u007F Zeppelin37\n" +
             "\n" +
             "Additional code:\n" +
             "\u007F RavenWolf\n" +
